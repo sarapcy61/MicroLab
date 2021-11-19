@@ -1,32 +1,21 @@
 #include <avr/io.h>
-#include <avr/pgmspace.h>
 #define F_CPU 1000000UL
 
-unsigned char display[10] PROGMEM = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f};
-
-void timer1_init()
-{
-
-}
-
-void timer0_init()
-{
-
-}
+unsigned char nums[10] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f};
 
 int main(void)
 {
-    DDRD = 0xff;
-    DDRC = 0x0f;
+    DDRC = 0xff;
+    DDRD = 0x0f;
 
-    unsigned int first = 0;
-    unsigned int second = 0;
-    unsigned int third = 0;
-    unsigned int fourth = 0;
+    unsigned int SS1 = 0;
+    unsigned int SS2 = 0;
+    unsigned int SS3 = 0;
+    unsigned int SS4 = 0;
 
     unsigned int counter = 1;
 
-    PORTC = ~counter;
+    PORTD = ~counter;
 
     TCCR1B |= (1 << CS11) | (1 << CS10);
     TCNT1 = 0;
@@ -38,50 +27,50 @@ int main(void)
         if (TCNT0 >= 155) {
             if (counter < 8) {
                 counter = counter << 1;
-                PORTC = ~(counter);
+                PORTD = ~(counter);
             }
             else {
                 counter = 0x01;
-                PORTC = ~(counter);
+                PORTD = ~(counter);
             }
 
-            PORTD = pgm_read_byte(&(display[3]));
+            PORTC = nums[3];
 
             if (counter & 1){
-                PORTD = pgm_read_byte(&(display[first]));
+                PORTC = nums[SS1];
             }
 
             else if (counter & 2){
-                PORTD = pgm_read_byte(&(display[second]));
+                nums[SS2];
             }
 
             else if (counter & 4){
-                PORTD = pgm_read_byte(&(display[third]));
+                nums[SS3];
             }
 
             else if (counter & 8){
-                PORTD = pgm_read_byte(&(display[fourth]));
+                nums[SS4];
             }
 
             TCNT0 = 0;
         }
 
         if (TCNT1 >= 7000){
-            first++;
-            second += first / 10;
-            first = first % 10;
+            SS1++;
+            SS2 += SS1 / 10;
+            SS1 = SS1 % 10;
 
-            third += second / 10;
-            second = second % 10;
+            SS3 += SS2 / 10;
+            SS2 = SS2 % 10;
 
-            fourth += third / 10;
-            third = third % 10;
+            SS4 += SS3 / 10;
+            SS3 = SS3 % 10;
 
-            if (fourth == 9 & third == 9 & second == 9 & first == 9) {
-                first = 0;
-                second = 0;
-                third = 0;
-                fourth = 0;
+            if (SS4 == 9 & SS3 == 9 & SS2 == 9 & SS1 == 9) {
+                SS1 = 0;
+                SS2 = 0;
+                SS3 = 0;
+                SS4 = 0;
             } 
 
             TCNT1 = 0;
